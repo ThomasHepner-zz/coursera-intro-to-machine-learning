@@ -62,43 +62,29 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-% Recode the labels as vectors containing only values of 0 or 1
-I = eye(num_labels);
-Y = zeros(m, num_labels);
+% Part 1: feedforwarding and cost function
+I = eye(num_labels); % (10x10)
+Y = zeros(m, num_labels); % (5000x10)
 for i=1:m
   Y(i, :) = I(y(i), :);
 end
 
-% Feedforward and return the cost in variable J
-a1 = [ones(m, 1) X] % appends a column of ones to the X matrix for the bias units
-z2 = a1 * Theta1';
-a2 = [ones(size(z2, 1), 1) sigmoid(z2)];
-z3 = a2 * Theta2';
-a3 = sigmoid(z3);
-h = a3;
+a1 = [ones(m, 1) X];
+z2 = a1*Theta1'; % (5000x401)*(401x25)=(5000x25)
+a2 = [ones(size(z2, 1), 1) sigmoid(z2)]; % (5000x26)
+z3 = a2*Theta2'; % (5000x26)*(26x10)=(5000x10)
+h = sigmoid(z3); % (5000x10)
 
-% Penalty
-p = sum(sum(Theta1(:, 2:end).^2, 2)) + sum(sum(Theta2(:, 2:end).^2, 2));
-
-% J computing
-J = sum(sum((-Y).*log(h) - (1 - Y).*log(1-h), 2))/m + lambda*p/(2*m);
-
-% Sigmas
-sigma3 = a3.-Y;
-sigma2 = (sigma3*Theta2).*sigmoidGradient([ones(size(z2, 1), 1) z2]);
-sigma2 = sigma2(:, 2:end);
-
-% Accumulate gradients
-delta_1 = (sigma2'*a1);
-delta_2 = (sigma3'*a2);
-
-% Calculate regularized gradient
-p1 = (lambda/m)*[zeros(size(Theta1, 1), 1) Theta1(:, 2:end)];
-p2 = (lambda/m)*[zeros(size(Theta2, 1), 1) Theta2(:, 2:end)];
-Theta1_grad = delta_1./m + p1;
-Theta2_grad = delta_2./m + p2;
-
-
+% Cost without regularization
+J = sum(sum((-Y).*log(h) - (1-Y).*log(1-h)), 2)/m;
+% Regularization penalty
+Theta1_p = Theta1(:, 2:end);
+Theta2_p = Theta2(:, 2:end);
+p_1 = sum(sum(Theta1_p.^2, 2));
+p_2 = sum(sum(Theta2_p.^2, 2));
+p = lambda*(p_1 + p_2)/(2*m);
+% Cost with regularization
+J = J + p;
 % -------------------------------------------------------------
 
 % =========================================================================
