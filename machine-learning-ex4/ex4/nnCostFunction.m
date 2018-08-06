@@ -90,23 +90,34 @@ J = J + p;
 % Accumulate gradients using every example in the dataset
 delta_1 = zeros(size(Theta1));
 delta_2 = zeros(size(Theta2));
+
+% This could be vectorized but was done through a for loop to show the operation
+% over each training example
 for t=1:m
   a1 = [1 X(t, :)]; % (1x401)
   z2 = a1*Theta1'; % (1x401)*(401x25)=(1x25)
   a2 = [1 sigmoid(z2)]; % (1x26)
   z3 = a2*Theta2'; % (1x26)*(26x10)=(1x10)
   a3 = sigmoid(z3);
+  
+  % Calculate sigmas
   % Layer 3
   sigma_k_3 = a3 - Y(t, :); % (1x10)
   % Layer 2
   sigma_k_2 = (sigma_k_3*Theta2) .* sigmoidGradient([1 z2]); % (1x10)*(10x26) .* (1x26)
   sigma_k_2 = sigma_k_2(2:end); % (1x25)
-  % Accumulate gradient
+  
+  % Accumulate gradients
   delta_1 = delta_1 + (sigma_k_2'*a1);
   delta_2 = delta_2 + (sigma_k_3'*a2);
 end
-Theta1_grad = delta_1./m;
-Theta2_grad = delta_2./m;
+
+% Compute regularization terms
+p_1 = (lambda/m)*[zeros(size(Theta1, 1), 1) Theta1(:, 2:end)];
+p_2 = (lambda/m)*[zeros(size(Theta2, 1), 1) Theta2(:, 2:end)];
+Theta1_grad = delta_1./m + p_1;
+Theta2_grad = delta_2./m + p_2;
+
 % -------------------------------------------------------------
 
 % =========================================================================
