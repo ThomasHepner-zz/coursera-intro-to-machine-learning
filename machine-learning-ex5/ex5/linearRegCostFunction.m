@@ -18,12 +18,15 @@ grad = zeros(size(theta));
 %
 %               You should set J to the cost and grad to the gradient.
 %
-h = X * theta;
-J = sum(((h - y) .^ 2)) / (2 * m) + lambda * (sum(theta .^ 2) - theta(1, 1) ^ 2) / (2 * m);
-grad = X' * (h - y) / m;
-thetaT = theta;
-thetaT(1, 1) = 0;
-grad += (lambda * thetaT) / m;
+
+% Regularized cost function
+h = X*theta;
+p = lambda*(theta(2:end)'*theta(2:end))/(2*m);
+J = sum((h-y).^2)/(2*m) + p;
+
+% Regularized gradients
+p_grad = lambda*[0 theta(2:end)]/m;
+grad = (((h-y)'*X)./m) + p_grad;
 
 % =========================================================================
 
