@@ -21,12 +21,14 @@ grad = zeros(size(theta));
 
 % Regularized cost function
 h = X*theta;
-p = lambda*(theta(2:end)'*theta(2:end))/(2*m);
-J = sum((h-y).^2)/(2*m) + p;
+diff = h - y;
+theta1 = [0; theta(2:end, :)];
+p = lambda*(theta1'*theta1);
+J = (diff'*diff)/(2*m) + p/(2*m);
 
 % Regularized gradients
-p_grad = lambda*[0 theta(2:end)]/m;
-grad = (((h-y)'*X)./m) + p_grad;
+p_grad = lambda*theta1/m;
+grad = (X'*diff)/m + p_grad;
 
 % =========================================================================
 
