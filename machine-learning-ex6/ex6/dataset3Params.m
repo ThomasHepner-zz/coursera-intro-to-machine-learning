@@ -30,15 +30,13 @@ for _C = values
     model = svmTrain(X, y, _C, @(x1, x2) gaussianKernel(x1, x2, _sigma));
     predictions = svmPredict(model, Xval);
     error = mean(double(predictions ~= yval));
-    if (error <= error_min)
+    if (error < error_min)
+      error_min = error;
       C = _C;
       sigma = _sigma;
-      error_min = error;
     end
   end
 end
-
-
 
 % =========================================================================
 
